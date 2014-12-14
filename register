@@ -14,27 +14,33 @@ import MySQLdb
 db = MySQLdb.connect(host='localhost', port=1234,
                      user='root', passwd='', db='quickShare')
 cursor = db.cursor()
-
-result = ''
+errors = ''
 what_to_print  = """
 <form method=post action=register><table>
 <tr><td>Name: </td><td><input type=text name=name /></td></tr>
-<tr><td>Password: </td><td><input type=text name=pass1 /></td></tr>
-<tr><td>Confirm Password: </td><td><input type=text name=pass2 /></td></tr>
+<tr><td>Password: </td><td><input type=password name=pass1 /></td></tr>
+<tr><td>Confirm Password: </td><td><input type=password name=pass2 /></td></tr>
 <tr><td><input type=submit value=Register! /></td></tr>
 </table></form>
 """
 if name:
-    result = "Error. Registration not successful."
-    if pass1 and pass2:
-        if pass1 == pass2:
+    errors += 'Error. Registration not successful.</br>'
+    if name  < 5:
+        errors += 'Username must be at least 5 characters</br>'
+    elif cursor.execute("SELECT * FROM User WHERE username='%s'" % name) >= 1:
+        errors += 'The user already exists.</br>'
+    elif pass1 and pass2:
+        if len(pass1) < 5:
+            errors += 'Password must be at least 5 characters</br>'
+        elif pass1 == pass2:
+            cursor.execute("Insert User set username='%s', password='%s'" % (name,pass1))
             what_to_print = name
-            what_to_print += " registration successful "
+            what_to_print += " your registration was successful "
             what_to_print += "<a href=login>click here</a>"
             what_to_print += " to go to login page!"
-            result = ''
+            errors = ''
         else:
-            result = "Error. Passwords do not match"
+            errors += "Error. Passwords do not match"
 print r"""Content-Type: text/html;charset=utf-8
 
 <html>
@@ -45,4 +51,6 @@ print r"""Content-Type: text/html;charset=utf-8
 %s
 </body>
 </html>
-""" % (page_functions.header(), page_functions.topLinks(), result, what_to_print)
+""" % (page_functions.header(), page_functions.topLinks(), errors, what_to_print)
+db.commit()
+db.close()

@@ -27,8 +27,8 @@ def topLinks(usr = None):
     </table>
     """
     return links
-def loginBox(usr, password, dbpass):
-    if usr and password == dbpass:
+def loginBox(usr, password):
+    if usr == 'andrew' and password == '123':
         return """
         %s <a href=main?session=%s>click here</a> to go to home page!
         """ % (usr,usr), False
@@ -36,7 +36,7 @@ def loginBox(usr, password, dbpass):
     <b>Login</b>
     <form method=post action='login'>
     User Name: <input type=text name=username /></br>
-    Password: &nbsp;&nbsp;<input type=password name=password /></br>
+    Password: &nbsp;&nbsp;<input type=text name=password /></br>
     Do not have an account? <a href=register>Click here</a> to register.</br>
     <input type=submit value=Submit />
     </form>

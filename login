@@ -8,10 +8,21 @@ import cgi
 form = cgi.FieldStorage()
 username = form.getfirst('username', '')
 password = form.getfirst('password', None)
-result = ''
-what_to_print, chk= page_functions.loginBox(username, password)
-if username != None and password != None and chk:
-   result = '<p>User does not exit or username/password wrong</p>'
+
+import MySQLdb
+db = MySQLdb.connect(host='localhost', port=1234,
+                     user='root', passwd='', db='quickShare')
+cursor = db.cursor()
+db_pass = ''
+errors = ''
+if username != '':
+   if (cursor.execute("SELECT password FROM User WHERE username='%s'" % username) >= 1):
+      db_pass = cursor.fetchone()[0]
+   else:
+      errors += 'The user name does not exist.</br>'    
+what_to_print, chk= page_functions.loginBox(username, password, db_pass)
+if chk and username and password:
+   errors = 'The password is incorrect.</br>'
 
 print r"""Content-Type: text/html;charset=utf-8
 
@@ -25,4 +36,4 @@ print r"""Content-Type: text/html;charset=utf-8
 </body>
 </html>
 """ % (page_functions.header(), page_functions.topLinks(),
-result, what_to_print)
+errors, what_to_print)
