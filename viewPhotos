@@ -1,0 +1,38 @@
+#!/usr/bin/env python
+# -*- coding: UTF-8 -*-
+# File: viewPhotos
+
+import cgitb; cgitb.enable()
+import page_functions
+import cgi
+form = cgi.FieldStorage()
+username = form.getfirst('session', '')
+result = ''
+if username != '':
+    result = ' ' + username
+
+print_table = ''
+if username != '':
+    print_table += '<table>\n'
+    print_table += '<tr>\n'
+    for i in range(1, 9):
+        if i % 5 == 0:
+            print_table +='</tr></tr>\n'
+        print_table += '<td>\n'
+        print_table += '<img src=/images/%s.jpg alt=%s.jpg width=300 height=300>\n' % (str(i), str(i))
+    print_table += '</tr>\n'
+    print_table += '</table>'
+
+print r"""Content-Type: text/html;charset=utf-8
+
+<html>
+%s
+<body>
+%s
+</br>
+%s's photos.
+%s
+</body>
+</html>
+""" % (page_functions.header(), page_functions.topLinks(username),
+result, print_table)

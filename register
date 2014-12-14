@@ -9,12 +9,18 @@ form = cgi.FieldStorage()
 name = form.getfirst('name', None)
 pass1 = form.getfirst('pass1', None)
 pass2 = form.getfirst('pass2', None)
+
+import MySQLdb
+db = MySQLdb.connect(host='localhost', port=1234,
+                     user='root', passwd='', db='quickShare')
+cursor = db.cursor()
+
 result = ''
 what_to_print  = """
 <form method=post action=register><table>
-<tr><td>name: </td><td><input type=text name=name /></td></tr>
-<tr><td>password: </td><td><input type=text name=pass1 /></td></tr>
-<tr><td>re-type password: </td><td><input type=text name=pass2 /></td></tr>
+<tr><td>Name: </td><td><input type=text name=name /></td></tr>
+<tr><td>Password: </td><td><input type=text name=pass1 /></td></tr>
+<tr><td>Confirm Password: </td><td><input type=text name=pass2 /></td></tr>
 <tr><td><input type=submit value=Register! /></td></tr>
 </table></form>
 """
