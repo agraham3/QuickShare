@@ -15,9 +15,9 @@ def topLinks(usr = None):
     <td><a href=main%s>Home</a></td>""" % to_add
     if usr and usr != '':
         links += "<td><a href=viewPhotos%s>View My Photos</a></td>\n" % to_add
-        links += "<td>Upload a Photo</td>\n"
+        links += "<td><a href=uploadPhoto%s>Upload a Photo</a></td>\n" % to_add
         links += "<td>Settings</td>\n"
-    links += "<td>View List of Users</td>\n"
+    links += "<td><a href=viewListOfUsers%s>View List of Users</a></td>\n" % to_add
     if usr and usr != '':
         links += "<td><a href=main>Logout</a></td>\n"
     else:

@@ -12,13 +12,17 @@ CREATE TABLE Album
 (
 ID int NOT NULL AUTO_INCREMENT,
 user_id int,
-name varchar(40) NOT NULL,
+album_name varchar(40) NOT NULL,
+file_path varchar(255) NOT NULL,
+is_private tinyint DEFAULT 0,
 PRIMARY KEY (ID)
 );
 CREATE TABLE Image
 (
 ID int NOT NULL AUTO_INCREMENT,
 user_id int,
-name varchar(40) NOT NULL,
+image_name varchar(40) NOT NULL,
+file_path varchar(255) NOT NULL,
+is_private tinyint DEFAULT 0,
 PRIMARY KEY (ID)
 );

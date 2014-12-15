@@ -2,6 +2,7 @@
 # -*- coding: UTF-8 -*-
 # File: register
 
+import os
 import cgitb; cgitb.enable()
 import page_functions
 import cgi
@@ -34,10 +35,10 @@ if name:
             errors += 'Password must be at least 5 characters</br>'
         elif pass1 == pass2:
             cursor.execute("Insert User set username='%s', password='%s'" % (name,pass1))
+            if not os.path.exists('/var/www/html/images/%s' %name):
+                os.system("mkdir /var/www/html/images/%s" %name)
             what_to_print = name
-            what_to_print += " your registration was successful "
-            what_to_print += "<a href=login>click here</a>"
-            what_to_print += " to go to login page!"
+            what_to_print += " your registration was successful!"
             errors = ''
         else:
             errors += "Error. Passwords do not match"

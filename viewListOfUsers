@@ -1,0 +1,40 @@
+#!/usr/bin/env python
+# -*- coding: UTF-8 -*-
+# File: viewListOfUser
+
+import cgitb; cgitb.enable()
+import page_functions
+import cgi
+form = cgi.FieldStorage()
+username = form.getfirst('session', '')
+result = ''
+if username != '':
+    result = ', ' + username
+
+import MySQLdb
+dbList = []
+listOfUsers = ''
+db = MySQLdb.connect(host='localhost', port=1234,
+                     user='root', passwd='', db='quickShare')
+cursor = db.cursor()
+if cursor.execute('SELECT username FROM User') >= 1:
+    dbList = cursor.fetchall()
+if dbList:
+    listOfUsers = ''
+    listOfUsers = '<table>\n'
+    for item in dbList:
+        if item[0] != username:
+            listOfUsers += '<tr><td><a href=viewPhotos?session=%s&view=%s>' % (username,item[0])
+            listOfUsers += '%s</a></td></tr>\n' % item[0]
+    listOfUsers += '</table>\n'
+print r"""Content-Type: text/html;charset=utf-8
+
+<html>
+%s
+<body>
+%s
+</br>
+%s
+</body>
+</html>
+""" % (page_functions.header(), page_functions.topLinks(username), listOfUsers)

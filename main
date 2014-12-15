@@ -8,7 +8,7 @@ import cgi
 form = cgi.FieldStorage()
 username = form.getfirst('session', '')
 result = ''
-if username != '':
+if username:
     result = ', ' + username
 
 print r"""Content-Type: text/html;charset=utf-8
