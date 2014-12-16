@@ -15,13 +15,13 @@ db = MySQLdb.connect(host='localhost', port=1234,
 cursor = db.cursor()
 db_pass = ''
 errors = ''
-if username != '':
+if username:
    if (cursor.execute("SELECT password FROM User WHERE username='%s'" % username) >= 1):
       db_pass = cursor.fetchone()[0]
    else:
       errors += 'The user name does not exist.</br>'    
 what_to_print, chk= page_functions.loginBox(username, password, db_pass)
-if chk and username and password:
+if chk and username and password and errors == '':
    errors = 'The password is incorrect.</br>'
 
 print r"""Content-Type: text/html;charset=utf-8

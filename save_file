@@ -10,7 +10,8 @@ username = form.getfirst('session', '')
 rename = form.getfirst('name', '')
 result = ''
 img = ''
-import osimport MySQLdb
+import os
+import MySQLdb
 db = MySQLdb.connect(host='localhost', port=1234,
                      user='root', passwd='', db='quickShare')
 cursor = db.cursor()
@@ -22,17 +23,20 @@ if fileitem.filename:
     file_root = '/var/www/html'
     file_path = '/images/%s/%s' % (username,fn)
     file_savepath = file_root + file_path
-    f = file(file_savepath, 'wb')
-    while 1:
-        chunk = fileitem.file.read(1024)
-        if not chunk:
-            break
-        f.write(chunk)
-    f.close()
-    img += '<img src="' + file_path + '" width=300 height=300/>\n'
-    message = 'The file "' + fn + '" was uploaded successfully'
-else:
-    message = 'No file was uploaded'
+    if cursor.execute("SELECT %s FROM Image Where image_name='%s'" % (userID,fn)) >= 1:
+        message = 'The image already exists'
+    else:
+        f = file(file_savepath, 'wb')
+        while 1:
+            chunk = fileitem.file.read(1024)
+            if not chunk:
+                break
+            f.write(chunk)
+        f.close()
+        img += '<img src="' + file_path + '" width=300 height=300/>\n'
+        message = 'The file "' + fn + '" was uploaded successfully'
+    else:
+        message = 'No file was uploaded'
 
 print r"""Content-Type: text/html;charset=utf-8
 
