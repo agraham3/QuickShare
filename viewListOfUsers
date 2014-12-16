@@ -38,3 +38,4 @@ print r"""Content-Type: text/html;charset=utf-8
 </body>
 </html>
 """ % (page_functions.header(), page_functions.topLinks(username), listOfUsers)
+db.close()

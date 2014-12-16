@@ -23,20 +23,26 @@ if fileitem.filename:
     file_root = '/var/www/html'
     file_path = '/images/%s/%s' % (username,fn)
     file_savepath = file_root + file_path
-    if cursor.execute("SELECT %s FROM Image Where image_name='%s'" % (userID,fn)) >= 1:
-        message = 'The image already exists'
+    userID = -1
+    if cursor.execute("SELECT ID FROM User WHERE username='%s'" % username) >= 1:
+        userID = cursor.fetchone()[0]
+    if userID == -1:
+        message = 'This user that is logged in right now does not exist'
     else:
-        f = file(file_savepath, 'wb')
-        while 1:
-            chunk = fileitem.file.read(1024)
-            if not chunk:
-                break
-            f.write(chunk)
-        f.close()
-        img += '<img src="' + file_path + '" width=300 height=300/>\n'
-        message = 'The file "' + fn + '" was uploaded successfully'
-    else:
-        message = 'No file was uploaded'
+        if cursor.execute("SELECT %s FROM Image WHERE image_name='%s'" % (userID,fn)) >= 1:
+            message = 'The image already exists'
+        else:
+            f = file(file_savepath, 'wb')
+            while 1:
+                chunk = fileitem.file.read(1024)
+                if not chunk:
+                    break
+                f.write(chunk)
+            f.close()
+            ex = "Insert Image set image_name='%s', file_path='%s'" %(fn,file_path)
+            ex += ", user_id='%s'" % userID
+            cursor.execute(ex)
+            message = 'The file "' + fn + '" was uploaded successfully'
 
 print r"""Content-Type: text/html;charset=utf-8
 
@@ -50,3 +56,5 @@ print r"""Content-Type: text/html;charset=utf-8
 </body>
 </html>
 """ % (page_functions.header(), page_functions.topLinks(username), message, img)
+db.commit()
+db.close()

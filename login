@@ -37,3 +37,4 @@ print r"""Content-Type: text/html;charset=utf-8
 </html>
 """ % (page_functions.header(), page_functions.topLinks(),
 errors, what_to_print)
+db.close()
