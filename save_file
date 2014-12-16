@@ -29,7 +29,7 @@ if fileitem.filename:
     if userID == -1:
         message = 'This user that is logged in right now does not exist'
     else:
-        if cursor.execute("SELECT %s FROM Image WHERE image_name='%s'" % (userID,fn)) >= 1:
+        if cursor.execute("SELECT * FROM Image WHERE user_ID='%s' AND image_name='%s'" % (userID,fn)) >= 1:
             message = 'The image already exists'
         else:
             f = file(file_savepath, 'wb')
