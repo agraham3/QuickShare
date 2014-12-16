@@ -9,20 +9,41 @@ form = cgi.FieldStorage()
 username = form.getfirst('session', '')
 view = form.getfirst('view', '')
 result = ''
+
+import MySQLdb
+db = MySQLdb.connect(host='localhost', port=1234,
+                     user='root', passwd='', db='quickShare')
+cursor = db.cursor()
 if view:
     result = ' ' + view
 elif username:
     result = ' ' + username
+    
+userID = -1
+if cursor.execute("SELECT ID FROM User WHERE username='%s'" % result.strip()) >= 1:
+    userID = cursor.fetchone()[0]
+photos = [] # (image_name, image_path)
+img_list = ''
+if cursor.execute("SELECT * FROM Image WHERE user_id='%s'" %userID) >= 1:
+    img_list = cursor.fetchall()
+for item in img_list:
+    if result.strip() != username:
+        if item[4] == 0:
+            photos.append((item[2], item[3]))
+    else:
+        photos.append((item[2], item[3]))
 
 print_table = ''
+i = 1
 if result:
     print_table += '<table>\n'
     print_table += '<tr>\n'
-    for i in range(1, 9):
+    for item in photos:
         if i % 5 == 0:
             print_table +='</tr></tr>\n'
         print_table += '<td>\n'
-        print_table += '<img src=/images/%s.jpg alt=%s.jpg width=300 height=300>\n' % (str(i), str(i))
+        print_table += "<img src='%s' alt='%s' width=300 height=300 />\n" %(item[1],item[0])
+        i = i + 1
     print_table += '</tr>\n'
     print_table += '</table>'
 
@@ -39,3 +60,4 @@ print r"""Content-Type: text/html;charset=utf-8
 </html>
 """ % (page_functions.header(), page_functions.topLinks(username),
 result, print_table)
+db.close()
