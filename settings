@@ -1,0 +1,83 @@
+#!/usr/bin/env python
+# -*- coding: UTF-8 -*-
+# File: settings
+
+import cgitb; cgitb.enable()
+import page_functions
+import cgi, os
+form = cgi.FieldStorage()
+username = form.getfirst('session', '')
+result = ''
+if username:
+    result = ', ' + username
+
+import MySQLdb
+db = MySQLdb.connect(host='localhost', port=1234,
+                     user='root', passwd='', db='quickShare')
+cursor = db.cursor()
+print_table = ''
+userID = -1
+if cursor.execute("SELECT ID FROM User WHERE username='%s'" % username) >= 1:
+    userID = cursor.fetchone()[0]
+
+if userID != -1:  
+    img_list = ''
+    if cursor.execute("SELECT * FROM Image WHERE user_id='%s'" %userID) >= 1:
+        img_list = cursor.fetchall()
+    # for settings - cgi
+    length = form.getfirst('len', None)
+    if length:
+        for item in img_list:
+            check = False
+            action = form.getfirst(item[2], '')
+            if action == 'Public':
+                check = True
+                ex = "UPDATE Image SET is_private=0 WHERE user_id='%s' AND image_name='%s'" % (userID, item[2])
+            elif action == 'Private':
+                check = True
+                ex = "UPDATE Image SET is_private=1 WHERE user_id='%s' AND image_name='%s'" % (userID, item[2])
+            elif action == 'Delete':
+                check = True
+                ex = "DELETE FROM Image WHERE  user_id='%s' AND image_name='%s'" % (userID, item[2])
+                file_path = '/images/%s/%s' % (username, item[2])
+            if check:
+                cursor.execute(ex)
+                
+    if cursor.execute("SELECT * FROM Image WHERE user_id='%s'" %userID) >= 1:
+        img_list = cursor.fetchall()
+    print_table = '<table><form method=post, action=settings>\n'
+    print_table += '<input type=hidden name=session value="%s" />' %username
+    print_table += '<input type=hidden name="len" value="%s" /><tr>' %len(img_list)
+    i = 0
+    for item in img_list:
+        if i != 0 and i % 4 == 0:
+            print_table += '</tr><tr>'
+        print_table += '<td>'
+        print_table += "<img src='%s' alt='%s' width=300 height=300 />" %(item[3],item[2])
+        print_table += '<br/><select name=%s>' %item[2]
+        if item[4] != 1:
+            print_table += '<option value=Public>Public</option>'
+            print_table += '<option value=Private>Private</option>'
+        else:
+            print_table += '<option value=Private>Private</option>'
+            print_table += '<option value=Public>Public</option>'
+        print_table += '<option value=Delete>Delete</option>'
+        print_table += '</select>'
+        print_table += '</td>'
+        i += 1
+    print_table += '\n<tr><td><input type=submit value="Save Settings" /></td></tr>\n'
+    print_table += '</tr></table></form>\n'
+    
+print r"""Content-Type: text/html;charset=utf-8
+
+<html>
+%s
+<body>
+%s
+</br>
+%s
+</body>
+</html>
+""" % (page_functions.header(), page_functions.topLinks(username), print_table)
+db.commit()
+db.close()
